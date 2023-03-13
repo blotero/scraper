@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: libretranslate-config
+data:
+  langs: "es,de,it,en,fr,hi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: libretranslate
+spec:
+  selector:
+    matchLabels:
+      app: libretranslate
+  template:
+    metadata:
+      labels:
+        app: libretranslate
+    spec:
+      containers:
+      - name: libretranslate
+        image: libretranslate/libretranslate:latest
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+        env:
+        - name: "LT_LOAD_ONLY"
+          valueFrom:
+            configMapKeyRef:
+              name: libretranslate-config
+              key: langs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: libretranslate-svc
+spec:
+  selector:
+    app: libretranslate
+  ports:
+  - port: 5000
+    targetPort: 5000
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: libretranslate-ingress
+  namespace: lpwan
+  labels:
+    app: libretranslate
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: libretrans-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+spec:
+  tls:
+  - hosts:
+    - trans.example.com
+    secretName: libretranslate-secret-tls
+  rules:
+  - host: trans.example.com
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: libretranslate-svc
+          servicePort: 5000

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: libretrans-auth
+type: Opaque
+data:
+  auth: YnJhbmRvbjoxMjM0NTY=
+  

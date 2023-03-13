@@ -1,0 +1,27 @@
+-First, aquired recursively web pages with httrack
+-Then, installed kubectl and eksctl from pacman respository
+
+-Then, used Amazon EKS for deploying a kubernetes service with the LibreTranslate application
+    -Creating EKS with Fargate:
+    eksctl create cluster --name my-cluster --region region-code --fargate
+
+    -Deploying application according to guide: https://jmrobles.medium.com/libretranslate-your-own-translation-service-on-kubernetes-b46c3e1af630
+    
+    -Result: FAIL
+
+-Then, used docker with ECS service from AWS...
+    - SOURCE1: https://docs.docker.com/cloud/ecs-integration/
+    - SOURCE2: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-container-image.html
+
+    Steps:
+
+    -Installed docker-compose from pacman repository
+    -Created docker context
+    -Installed libretranslate with python (useless)
+    -Enabled docker service
+    -Reboot
+    -Clonse LibreTranslate respository
+    -Build service with docker compose up command on LibreTranslate repository directory
+
+
+
