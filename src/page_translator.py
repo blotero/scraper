@@ -44,4 +44,22 @@ class RecursiveHtmlTranslator:
                     f_out.write(translated_content)
                     f_out.close()
 
+    
+    def get_strings(self,html_text ):
+        print(f"Getting strings for {path}")
+        soup = BeautifulSoup(html_text, 'html.parser')
+        elements = {}
+        interest_items = ['br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'i', 'a']
+        for key in interest_items:
+            elements[key] = soup.find_all(key)
+        self.elements = elements
+
+    def translate(self):
+        for key,value_list in self.elements.items():
+            print(f"Translating items from {key}...")
+            for value in value_list:
+                print(f"Original: {value}")
+                translated = translator.translate(value, 'en', 'hi')
+                print(f"Translated: {translated}")
+
                     

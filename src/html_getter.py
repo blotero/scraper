@@ -1,35 +1,36 @@
 import re
-from html.parser import HTMLParser
+from bs4 import BeautifulSoup
+import json
+from libretranslatepy import LibreTranslateAPI
 
-
-class MyHTMLParser(HTMLParser):
-    def handle_starttag(self, tag, attrs):
-        print("Encountered a start tag:", tag)
-
-    def handle_endtag(self, tag):
-        print("Encountered an end tag :", tag)
-
-    def handle_data(self, data):
-        print("Encountered some data  :", data)
-
+translator_api = "http://44.201.42.242:5000/"
+translator = LibreTranslateAPI(translator_api)
 
 class HtmlTextGetter:
     def __init__(self, path):
         self.path = path
-    def get_strings(self):
+    def translate(self):
         print(f"Getting strings for {path}")
-        parser = MyHTMLParser()
         with (open(path)) as f:
-            html_content = f.read()
-            parser.feed(html_content)
-            
-        
+            html_text = f.read()
+            soup = BeautifulSoup(html_text, 'html.parser')
+            elements = {}
+            interest_items = ['br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'i', 'a']
+            for key in interest_items:
+                tags = soup.findAll(key)
+                for tag in tags:
+                    # print(f"Original: {tags[i].string}")
+                    translated = translator.translate(tag.string, 'en', 'hi') if tag.string else None
+                    if translated:
+                        print(f"Translated: {translated}")
+                        html_text = html_text.replace(tag.string,translated)
+
+            with(open("output.html", "w")) as fout:
+                fout.write(html_text)
+                fout.close()
+
 
 if __name__ == '__main__':
     path = "/home/brandon/My Web Sites/classcentral/index.html"
     htg = HtmlTextGetter(path)
-    res = htg.get_strings()
-    print(res)
-
-
-    
+    htg.translate()
