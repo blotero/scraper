@@ -1,9 +1,9 @@
 from libretranslatepy import LibreTranslateAPI
 from path_utils import list_html_files,list_non_html_files
-from googletrans import Translator
 from bs4 import BeautifulSoup
 import shutil
 import os
+import re
 
 
 class RecursiveHtmlTranslator:
@@ -21,11 +21,11 @@ class RecursiveHtmlTranslator:
     def translate_from_root_dir(self, output_dir):
         html_files = list_html_files(self.root_path)
         for i,file in enumerate(html_files):
-            end_name = file.replace(self.root_path, output_dir)
-            print(f"Writing: {end_name}... ({i}/{len(html_files)})")
+            save_file = file.replace(self.root_path, output_dir)
+            print(f"Writing: {save_file}... ({i}/{len(html_files)})")
             translated_content = self.translateHtmlFile(file)
-            os.makedirs(os.path.dirname(file), exist_ok=True)
-            f_out = open(end_name, "w")
+            os.makedirs(os.path.dirname(save_file), exist_ok=True)
+            f_out = open(save_file, "w")
             f_out.write(translated_content)
             f_out.close()
 
@@ -40,9 +40,9 @@ class RecursiveHtmlTranslator:
         with (open(path)) as f:
             html_text = f.read()
             soup = BeautifulSoup(html_text, 'html.parser')
-            elements = {}
-            interest_items = ['br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'i', 'a',
-                              'label','span']
+            interest_items = ['p','a', re.compile("h[1-6]"),'label','button','li','i']
+            # interest_items = ['div']
+
             for key in interest_items:
                 tags = soup.findAll(key)
                 for tag in tags:
